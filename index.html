@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Változtasd meg a háttérszínt!</title>
+<style>
+       body {
+           height: 100vh;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           font-family: Arial, sans-serif;
+       }
+       button, input, select {
+           padding: 10px 20px;
+           font-size: 16px;
+           margin: 10px;
+       }
+       img {
+           width: 300px;
+           height: 200px;
+           margin-top: 20px;
+           cursor: pointer;
+       }
+</style>
+</head>
+<body>
+<button id="colorButton">Változtasd meg a háttérszínt!</button>
+<input type="text" id="textChangeInput">
+<select id="sizeSelect">
+    <option value="small">Kicsi</option>
+    <option value="medium" selected>Közepes</option>
+    <option value="large">Nagy</option>
+    </select>
+<img id="imageChange" src="https://euroradio.fm/sites/default/files/2023-08/164.gif" alt="Placeholder Image">
+<script>
+       
+       function getRandomColor() {
+           const letters = '0123456789ABCDEF';
+           let color = '#';
+           for (let i = 0; i < 6; i++) {
+               color += letters[Math.floor(Math.random() * 16)];
+           }
+           return color;
+       }
+       
+       document.getElementById('colorButton').addEventListener('click', function() {
+           
+           document.body.style.backgroundColor = getRandomColor();
+       });
+
+       
+       const inputField = document.getElementById('textChangeInput');
+       inputField.addEventListener('keydown', function(event) {
+           
+           console.log(event.target.value);
+           
+           if (event.shiftKey) {
+               console.log("Shift gomb lenyomva");
+           }
+       });
+       inputField.addEventListener('input', function(event) {
+           
+           console.log(event.target.value);
+       });
+
+        
+        const imageElement = document.getElementById('imageChange');
+       const originalSrc = imageElement.src;
+       const hoverSrc = 'https://pbs.twimg.com/media/GIOpTRlXEAEABbb.jpg';
+       imageElement.addEventListener('mouseenter', function() {
+           imageElement.src = hoverSrc;
+       });
+       imageElement.addEventListener('mouseleave', function() {
+           imageElement.src = originalSrc;
+       });
+
+        const sizeSelect = document.getElementById('sizeSelect');
+       sizeSelect.addEventListener('change', function(event) {
+           const selectedSize = event.target.value;
+           if (selectedSize === 'small') {
+               imageElement.style.width = '150px';
+               imageElement.style.height = '100px';
+           } else if (selectedSize === 'medium') {
+               imageElement.style.width = '300px';
+               imageElement.style.height = '200px';
+           } else if (selectedSize === 'large') {
+               imageElement.style.width = '450px';
+               imageElement.style.height = '300px';
+           }
+       });
+</script>
+</body>
+</html>

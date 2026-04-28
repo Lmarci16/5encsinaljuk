@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Világországok Tudásportál</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 20px; background-color: #f0f0f0; }
+    header, nav, main, footer { margin-bottom: 20px; }
+    #map { height: 400px; }
+    .dark-mode { background-color: #121212; color: #f0f0f0; }
+    img.flag { width: 50px; }
+    img.country-image { max-width: 100%; height: auto; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Világországok Tudásportál</h1>
+    <nav>
+      <button onclick="showPage('home')">Főoldal</button>
+      <button onclick="showPage('search')">Ország keresése</button>
+      <button onclick="randomCountry()">Véletlenszerű ország</button>
+      <button onclick="showPage('contact')">Kapcsolat</button>
+      <button onclick="toggleDarkMode()">Sötét/Világos mód</button>
+    </nav>
+  </header>
+
+  <main id="home">
+    <h2>Üdvözlünk a Tudásportálon!</h2>
+    <p>Fedezd fel a világ országait adatokal, térképekkel, képekkel!</p>
+  </main>
+
+  <main id="search" style="display:none">
+    <h2>Ország keresése</h2>
+    <input type="text" id="countryInput" placeholder="Ország neve...">
+    <button onclick="searchCountry()">Keresés</button>
+    <div id="searchResult"></div>
+    <canvas id="gdpChart" style="max-width: 600px; margin-top: 20px;"></canvas>
+  </main>
+
+  <main id="contact" style="display:none">
+    <h2>Kapcsolat</h2>
+    <form>
+      <label>Név:</label><br>
+      <input type="text" required><br>
+      <label>Üzenet:</label><br>
+      <textarea required></textarea><br>
+      <button type="submit">Küldés</button>
+    </form>
+  </main>
+
+  <div id="map" style="display:none"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const apiUrl = 'https://restcountries.com/v3.1/name/';
+    const unsplashUrl = 'https://api.unsplash.com/search/photos?client_id=YOUR_UNSPLASH_ACCESS_KEY&query=';
+
+    function showPage(page) {
+      document.querySelectorAll('main').forEach(m => m.style.display = 'none');
+      document.getElementById(page).style.display = 'block';
+      document.getElementById('map').style.display = (page === 'search') ? 'block' : 'none';
+    }
+
+    function searchCountry() {
+      const name = document.getElementById('countryInput').value;
+      fetch(apiUrl + name)
+        .then(res => res.json())
+        .then(data => {
+          const country = data[0];
+          const name = country.name.common;
+          const capital = country.capital;
+          const population = country.population;
+          const languages = Object.values(country.languages || {}).join(', ');
+          const flag = country.flags.svg;
+          const latlng = country.latlng;
+
+          document.getElementById('searchResult').innerHTML = `
+            <h3>${name}</h3>
+            <img class="flag" src="${flag}" alt="Zászló">
+            <p>Főváros: ${capital}</p>
+            <p>Népesség: ${population.toLocaleString()}</p>
+            <p>Hivatalos nyelvek: ${languages}</p>
+            <div id="countryImage"></div>
+          `;
+
+          showMap(latlng[0], latlng[1]);
+          fetchUnsplashImage(name);
+          fetchGDPChart(name);
+        });
+    }
+
+    function randomCountry() {
+      fetch('https://restcountries.com/v3.1/all')
+        .then(res => res.json())
+        .then(data => {
+          const country = data[Math.floor(Math.random() * data.length)];
+          alert(`Ország: ${country.name.common}\nFőváros: ${country.capital}`);
+        });
+    }
+
+    let map;
+    function showMap(lat, lng) {
+      if (map) map.remove();
+      map = L.map('map').setView([lat, lng], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap hozzájárulók'
+      }).addTo(map);
+      L.marker([lat, lng]).addTo(map);
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function fetchUnsplashImage(country) {
+      fetch(unsplashUrl + country)
+        .then(res => res.json())
+        .then(data => {
+          const imageUrl = data.results[0]?.urls?.small;
+          if (imageUrl) {
+            document.getElementById('countryImage').innerHTML = `<img class="country-image" src="${imageUrl}" alt="${country} kép">`;
+          }
+        });
+    }
+
+    function fetchGDPChart(countryName) {
+      const countries = ['Hungary', 'Germany', 'France', countryName];
+      Promise.all(countries.map(name => fetch(apiUrl + name).then(res => res.json()))).then(responses => {
+        const gdpData = responses.map(data => {
+          const country = data[0];
+          return {
+            name: country.name.common,
+            gdp: country.gini ? Object.values(country.gini)[0] : Math.random() * 100
+          };
+        });
+
+        const ctx = document.getElementById('gdpChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: gdpData.map(d => d.name),
+            datasets: [{
+              label: 'GDP (szimulált vagy GINI %)',
+              data: gdpData.map(d => d.gdp),
+              backgroundColor: 'rgba(75, 192, 192, 0.5)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autók</title>
+</head>
+<style>
+    table{
+        width: 100%;
+    }
+    tr{
+        width: 100%;
+        line-height: 40px;
+    }
+    td,th {
+        width:25%;
+        text-align: center;
+        font-size: 15px;
+    }
+    #elsosor{
+        font-weight: bold;
+        background-color: lightgray;
+        width: 100%;
+        text-align: center;
+        line-height: 40px;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    table, td{
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+   
+</style>
+<body>
+    <h1 align="center">Autók API-ból</h1>
+    <input type="text" id="kereses-bevitel" placeholder="Keresés márka szerint">
+    <p><button type=button onclick="keresAuto()">Keresés</button></p>
+    <table>
+        <tr id="elsosor">
+            <th id="hiba">ID</th>
+            <th>Márka</th>
+            <th>Modell</th>
+            <th>Év</th>
+        </tr>
+        
+    </table>
+    <table id="tabla">
+
+        </table>
+    <script>
+        var tablazat= document.getElementById("tabla");
+        let adat=[];
+        async function nemtom() {
+            try {
+                const valasz=await fetch("http://localhost:5000/api/cars");
+                if (!valasz.ok) { 
+                    throw new Error('API hiba');
+                }
+                
+                adat=await valasz.json();
+                console.log(adat);
+                adat.forEach(element => {
+                tablazat.innerHTML+=`
+                <tr>
+                    <td>${element.id}</td>
+                    <td>${element.brand}</td>  
+                    <td>${element.model}</td> 
+                    <td>${element.year}</td> 
+                </tr>
+                `
+                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('hiba').textContent=`Hiba az adatok megjelenítésekor`,error;
+            }}
+            function keresAuto(){
+            let ev=document.getElementById("kereses-bevitel").value;//a beviteli mezőbe írt márka átvétele változóba és kisbetűssé alakítás
+            console.log(ev);
+            let szurtautok=[]; //üres tömb a kiválogatott autók számára
+
+            //végigmegyek az eredeti tömbön (összes autó), és ha megtálom a bekért márkát, akkor szurtautok tombbe tezsem az adatait
+            /* for (let i = 0; i < autoAdatok.length; i++) {
+                if (autoAdatok[i].brand.toLowerCase()==bevittMarka.toLowerCase()) {//ha megtalálom a bekért márkát, hogy ne legyen érzékeny a kis/nagybetükre kisbetűssé alakitom...így csak pontos egyezésre működik, ha márka szövegrészletre is szeretnám hogy működjön akkor includes metódus kellene
+                    szurtautok.push(autoAdatok[i]);//akkor az adatait a tömbhoz adom
+                }                  
+            } */
+
+            for (let i = 0; i < adat.length; i++) {
+                if (adat[i].year.toString().includes(ev)) {//ha csak részletében tartalmazza az adot autómárka a keresett márkát
+                    szurtautok.push(adat[i]);//akkor az adatait a tömbhoz adom
+                }                  
+            }
+
+            //A kiekeresett márka autót teszem a táblázatba, a régi adatok helyére!!
+            //kiüritem a táblázat törzsét
+            document.getElementById("tabla").innerHTML="";//üressé teszi a táblázat törzsét
+
+            for (let i = 0; i < szurtautok.length; i++) {//a keresett márkájú autokat tartalmazó tömbön megyek végig
+                //console.log(szurtautok[i]);
+                const sor=document.createElement("tr");//sor változóba létrehozok egy táblázat sort
+                let auto=szurtautok[i];//az adott elemet változóba teszem
+                    sor.innerHTML=`<td>${auto.id}</td> <td>${auto.brand}</td><td>${auto.model}</td><td>${auto.year}</td>`;//a sor celláiba helyezem az adott autó adatait
+
+                    document.getElementById("tabla").appendChild(sor);//sor hozzáadása a táblázathoz                
+            }}
+        nemtom();
+        
+    </script>
+</body>
+</html>

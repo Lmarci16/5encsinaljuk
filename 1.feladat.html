@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="unalom">Valami</h1>
+
+    <p class="elso">Fall</p>
+    <p class="masodik">Fall in</p>
+    <p class="harmadik">Fall in love - everything is romantic - charlie xcx</p>
+    <button id="gomb" onclick="nyom()">Nyomd ki a szemem!</button>
+    <button id="gomb2" onclick="torol()">Dáviddd buz</button>
+    <input id="bemenet"/>
+    <button onclick="anyad()">Kiiratás</button>
+    <ul id="myList">
+        <li>a</li>
+        <li>b</li>
+        <li>c</li>
+        <li>d</li>
+        <li>e</li>
+    </ul>
+    <script>
+        const cim = document.getElementById("unalom");
+        const harom=document.querySelector(".harmadik");
+        cim.textContent="DOM gyakorlás";
+        console.log(cim.textContent);
+        console.log(harom.textContent);
+        const p=document.querySelectorAll("p");
+        for (let i = 0; i < p.length; i++) {
+            p[i].style.color="blue";
+            
+        }
+        p[0].style.fontWeight="bold";
+
+        function nyom() {
+            const p = document.createElement("p");
+            p.textContent = "Ez egy új bekezdés.";
+            document.body.appendChild(p);
+        }
+        function torol() {
+            const p2=document.querySelector(".elso");
+            p2.remove();
+        }
+        function anyad() {
+            const be=document.getElementById("bemenet");
+            if (be.value) {
+                const kiir=document.createElement("p");
+                kiir.textContent=be.value;
+                document.body.appendChild(kiir);
+            }
+        }
+
+        const lista = document.getElementById("myList");
+
+  // Új elem létrehozása
+  const ujElem = document.createElement("li");
+  ujElem.textContent = "Új elem";
+
+  // Beszúrás az utolsó után (a lista végére)
+  lista.appendChild(ujElem);
+
+  // Az utolsó elem törlése
+  lista.removeChild(lista.lastElementChild);
+        
+    </script>
+</body>
+</html>
