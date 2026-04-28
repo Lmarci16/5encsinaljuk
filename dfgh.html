@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista bővítése</title>
+</head>
+<body>
+  <input type="text" id="itemInput" placeholder="Írj be valamit">
+  <button onclick="addItem()">Hozzáadás</button>
+
+  <ul id="myList">
+    <li>Első elem</li>
+    <li>Második elem</li>
+  </ul>
+
+  <script>
+    function addItem() {
+      const input = document.getElementById("itemInput");
+      const newItemText = input.value.trim(); // ne legyen üres / szóköz
+      if (newItemText !== "") {
+        const li = document.createElement("li");
+        li.textContent = newItemText;
+        document.getElementById("myList").appendChild(li);
+        input.value = ""; // ürítsük ki a mezőt
+      }
+    }
+  </script>
+</body>
+</html>

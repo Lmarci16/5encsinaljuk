@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amúgy 5en csinálják az osztályból ezt a feladatot, de természetesen csak nálam probléma a telefon nyomkodása...</title>
+</head>
+<body>
+    <input type="text" id="idk" placeholder="semmi"/>
+    <button onclick="add()">
+        Hozzáadaás
+    </button>
+    <ul id="filmlist"></ul>
+<script>
+
+    function add() {
+        
+    
+    
+    const be=document.getElementById("idk");
+    const newitem=be.value.trim();
+    
+    if (newitem!=="") {
+        const ujelem=document.createElement("li");
+        ujelem.textContent=newitem+" ";
+        
+        
+        const gomb=document.createElement("button");
+    gomb.textContent="Értékelés";
+    gomb.onclick=function(){
+        const rating =prompt("Adj értékelést a filmhez:");
+        if (rating) {
+            if(ujelem.querySelector(".rating")){
+                ujelem.querySelector(".rating").textContent="Értékelés: "+rating;
+            }   else{
+                const span=document.createElement("span");
+                span.className="rating";
+                span.textContent="Értékelés: "+rating;
+                ujelem.appendChild(span);
+            }
+
+
+        
+        
+    };
+
+    
+            
+        };ujelem.appendChild(gomb);
+
+            // Törlés gomb
+            const torles = document.createElement("button");
+            torles.textContent = "Törlés";
+            torles.onclick = function() {
+                ujelem.remove();
+            };
+            ujelem.appendChild(torles);
+
+            document.getElementById("filmlist").appendChild(ujelem);
+            be.value = "";
+    }
+}
+
+
+  
+</script>
+</body>
+</html>
